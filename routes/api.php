@@ -1,8 +1,11 @@
 <?php
 
-use App\Http\Controllers\IngestController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\IngestController;
+use App\Http\Controllers\TopologyController;
+use App\Http\Controllers\MetricQueryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,3 +24,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware(['ingest', 'throttle:120,1'])
     ->post('/ingest', IngestController::class);
+
+Route::get('/units/{unit}/topology', [TopologyController::class, 'show']);
+Route::get('/metrics/query', [MetricQueryController::class, 'query']);
