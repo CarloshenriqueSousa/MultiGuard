@@ -1,6 +1,6 @@
 <?php
 /**
- * Cria as tabelas de historico de indices de saude e incidentes com causa provavel.
+ * Cria as tabelas de historico de indices de saude e incidentes com causa provavel
  */
 
 use Illuminate\Database\Migrations\Migration;
