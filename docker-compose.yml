@@ -1,0 +1,15 @@
+services:
+  db:
+    image: timescale/timescaledb:latest-pg16
+    container_name: mg-db
+    environment:
+      POSTGRES_USER: multiguard
+      POSTGRES_PASSWORD: multiguard
+      POSTGRES_DB: multiguard
+    ports:
+      - "5433:5432"
+    volumes:
+      - mg_pgdata:/var/lib/postgresql/data
+
+volumes:
+  mg_pgdata:
