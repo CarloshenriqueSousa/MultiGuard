@@ -8,6 +8,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Unit;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -45,7 +46,7 @@ class HealthController extends Controller
 
         return response()->json([
             'unit' => ['name' => $unit->name, 'slug' => $unit->slug],
-            'evaluated_at' => $summary?->calculated_at,
+            'evaluated_at' => $summary ? Carbon::parse($summary->calculated_at)->toIso8601String() : null,
             'health' => $summary ? ['score' => $summary->score, 'status' => $summary->status] : null,
             'devices' => $rows->filter(fn ($row) => $row->device_id !== null)->values(),
             'links' => $rows->filter(fn ($row) => $row->link_id !== null)->values(),

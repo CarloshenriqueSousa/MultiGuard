@@ -7,6 +7,8 @@ use App\Http\Controllers\IngestController;
 use App\Http\Controllers\TopologyController;
 use App\Http\Controllers\MetricQueryController;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\IncidentController;
+use App\Http\Controllers\SeriesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,3 +30,5 @@ Route::middleware(['ingest', 'throttle:120,1'])
 Route::get('/units/{unit}/topology', [TopologyController::class, 'show']);
 Route::get('/metrics/query', [MetricQueryController::class, 'query']);
 Route::get('/units/{unit}/health', [HealthController::class, 'show']);
+Route::get('/units/{unit}/series', SeriesController::class);
+Route::get('/units/{unit}/incidents', [IncidentController::class, 'index']);
