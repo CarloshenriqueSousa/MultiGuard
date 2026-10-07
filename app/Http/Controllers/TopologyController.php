@@ -1,4 +1,7 @@
 <?php
+/**
+ * Expoe a topologia de uma unidade (dispositivos e enlaces) para o console e para o mapa
+ */
 
 namespace App\Http\Controllers;
 
@@ -8,9 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 class TopologyController extends Controller
 {
-    /**
-     * Retorna a topologia completa da unidade (nós e enlaces)
-     */
     public function show(string $unitSlug): JsonResponse
     {
         $unit = Unit::where('slug', $unitSlug)->first();
@@ -19,15 +19,21 @@ class TopologyController extends Controller
             return response()->json(['error' => 'Unidade não encontrada'], 404);
         }
 
-        $devices = DB::table('devices')
+        $nodes = DB::table('devices')
             ->where('unit_id', $unit->id)
-            ->select('id', 'name', 'slug', 'type', 'layer', 'ip')
-            ->orderBy('layer', 'desc')
-            ->get();
+            ->select('id', 'name', 'layer', 'kind', 'ip', 'position')
+            ->orderBy('id')
+            ->get()
+            ->map(function ($device) {
+                $device->position = json_decode($device->position, true);
 
-        $links = DB::table('links')
+                return $device;
+            });
+
+        $edges = DB::table('links')
             ->where('unit_id', $unit->id)
-            ->select('id', 'name', 'source_device_id', 'target_device_id', 'speed_mbps')
+            ->select('id', 'from_device_id', 'to_device_id', 'capacity_bps')
+            ->orderBy('id')
             ->get();
 
         return response()->json([
@@ -36,8 +42,8 @@ class TopologyController extends Controller
                 'name' => $unit->name,
                 'slug' => $unit->slug,
             ],
-            'nodes' => $devices,
-            'edges' => $links,
+            'nodes' => $nodes,
+            'edges' => $edges,
         ]);
     }
 }
