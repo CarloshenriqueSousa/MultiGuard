@@ -1,0 +1,12 @@
+/*
+ * Estilo global do console Multi-Guard: camadas do Tailwind e o fundo escuro padrao das paginas.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    background-color: #0b0f19;
+    color: #e2e8f0;
+}
