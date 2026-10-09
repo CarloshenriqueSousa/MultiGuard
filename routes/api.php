@@ -9,6 +9,7 @@ use App\Http\Controllers\MetricQueryController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\IncidentController;
 use App\Http\Controllers\SeriesController;
+use App\Http\Controllers\LatestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,3 +33,4 @@ Route::get('/metrics/query', [MetricQueryController::class, 'query']);
 Route::get('/units/{unit}/health', [HealthController::class, 'show']);
 Route::get('/units/{unit}/series', SeriesController::class);
 Route::get('/units/{unit}/incidents', [IncidentController::class, 'index']);
+Route::get('/units/{unit}/latest', LatestController::class);

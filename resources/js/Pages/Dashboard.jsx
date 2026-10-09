@@ -7,10 +7,13 @@
 
 import { useState } from 'react';
 import { Head } from '@inertiajs/react';
+
 import Header from '../Components/Header';
 import IncidentList from '../Components/IncidentList';
 import SeriesPanel from '../Components/SeriesPanel';
 import StatusGrid from '../Components/StatusGrid';
+import NavTabs from '../Components/NavTabs';
+
 import { usePolling } from '../lib/usePolling';
 
 export default function Dashboard({ unitSlug }) {
@@ -33,6 +36,7 @@ export default function Dashboard({ unitSlug }) {
             <Head title="Multi-Guard" />
 
             <div className="mx-auto max-w-7xl space-y-6 p-6">
+                <NavTabs current="dashboard" />
                 <Header
                     unitName={topology.data?.unit?.name ?? health.data?.unit?.name ?? unitSlug}
                     health={health.data?.health ?? null}
