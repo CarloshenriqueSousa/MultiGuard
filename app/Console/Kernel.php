@@ -12,7 +12,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('mg:evaluate unidade-teste --for=55 --interval=10')
+            ->everyMinute()
+            ->withoutOverlapping(2)
+            ->runInBackground();
+
+        $schedule->command('mg:prune')->hourly();
     }
 
     /**

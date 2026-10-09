@@ -1,8 +1,10 @@
 <?php
 /**
- * Executa o motor de diagnostico para a unidade. Sem opcoes faz uma avaliacao e termina; com --loop repete
- * a cada --interval segundos (usado no laboratorio enquanto nao ha um servico agendado). Cada linha mostra
- * o indice de saude da unidade e as causas encontradas naquele ciclo.
+ * Executa o motor de diagnostico para a unidade. Sem opcoes faz uma avaliacao e termina. Com --loop repete a
+ * cada --interval segundos ate ser interrompido; com --for=N repete por no maximo N segundos e termina, formato
+ * usado pelo agendador do Laravel, que dispara este comando uma vez por minuto (o agendador do Laravel 10 nao
+ * executa tarefas em intervalo menor que um minuto). Cada linha mostra o indice de saude da unidade e as causas
+ * encontradas naquele ciclo.
  */
 
 namespace App\Console\Commands;
@@ -13,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class Evaluate extends Command
 {
-    protected $signature = 'mg:evaluate {unit=unidade-teste} {--loop} {--interval=10}';
+    protected $signature = 'mg:evaluate {unit=unidade-teste} {--loop} {--interval=10} {--for=0}';
 
     protected $description = 'Avalia a saude e diagnostica a causa provavel de uma unidade';
 
@@ -27,6 +29,11 @@ class Evaluate extends Command
             return self::FAILURE;
         }
 
+        $interval = max(1, (int) $this->option('interval'));
+        $limit = (int) $this->option('for');
+        $repeat = $limit > 0 || $this->option('loop');
+        $deadline = $limit > 0 ? microtime(true) + $limit : null;
+
         do {
             $result = $engine->evaluate($unit);
 
@@ -38,11 +45,15 @@ class Evaluate extends Command
                 $result['findings'] === [] ? 'sem incidentes' : implode(', ', $result['findings'])
             ));
 
-            if (! $this->option('loop')) {
+            if (! $repeat) {
                 break;
             }
 
-            sleep(max(1, (int) $this->option('interval')));
+            if ($deadline !== null && microtime(true) + $interval > $deadline) {
+                break;
+            }
+
+            sleep($interval);
         } while (true);
 
         return self::SUCCESS;

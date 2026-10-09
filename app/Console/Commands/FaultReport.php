@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class FaultReport extends Command
 {
-    protected $signature = 'mg:fault-report {unit=unidade-teste}';
+    protected $signature = 'mg:fault-report {unit=unidade-teste} {--from=0}';
 
     protected $description = 'Compara as falhas injetadas com o diagnostico do motor (K1 e K3)';
 
@@ -28,7 +28,7 @@ class FaultReport extends Command
 
         $faults = DB::table('fault_injections as f')
             ->leftJoin('devices as d', 'd.id', '=', 'f.expected_device_id')
-            ->where('f.unit_id', $unit->id)
+            ->where('f.id', '>=', (int) $this->option('from'))
             ->orderBy('f.id')
             ->select('f.id', 'f.kind', 'f.expected_cause', 'f.detected_cause', 'f.started_at', 'f.detected_at', 'd.name as target')
             ->get();
