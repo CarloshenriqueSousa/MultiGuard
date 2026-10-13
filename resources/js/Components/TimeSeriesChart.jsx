@@ -22,7 +22,13 @@ export default function TimeSeriesChart({ timestamps, values, label, color, inci
 
     incidentsRef.current = incidents;
 
+    const hasData = timestamps && timestamps.length > 0;
+
     useEffect(() => {
+        if (!hasData || !container.current) {
+            return;
+        }
+
         const element = container.current;
 
         const options = {
@@ -41,7 +47,7 @@ export default function TimeSeriesChart({ timestamps, values, label, color, inci
 
                         u.ctx.save();
 
-                        incidentsRef.current.forEach((incident) => {
+                        incidentsRef.current?.forEach((incident) => {
                             const start = Math.max(left, u.valToPos(incident.started_ts, 'x', true));
                             const end = Math.min(left + width, u.valToPos(Math.max(incident.ended_ts, incident.started_ts + 5), 'x', true));
 
@@ -59,7 +65,7 @@ export default function TimeSeriesChart({ timestamps, values, label, color, inci
             },
         };
 
-        plot.current = new uPlot(options, [[], []], element);
+        plot.current = new uPlot(options, [timestamps, values], element);
 
         const observer = new ResizeObserver(() => {
             plot.current?.setSize({ width: element.clientWidth, height });
@@ -72,15 +78,25 @@ export default function TimeSeriesChart({ timestamps, values, label, color, inci
             plot.current?.destroy();
             plot.current = null;
         };
-    }, [label, color, height]);
+    }, [hasData, label, color, height]);
 
     useEffect(() => {
-        plot.current?.setData([timestamps, values]);
-    }, [timestamps, values, label, color, height]);
+        if (plot.current && hasData) {
+            plot.current.setData([timestamps, values]);
+        }
+    }, [timestamps, values, hasData]);
 
     useEffect(() => {
         plot.current?.redraw();
     }, [incidents]);
+
+    if (!hasData) {
+        return (
+            <div style={{ height }} className="flex w-full items-center justify-center rounded border border-dashed border-slate-800 text-xs text-slate-500">
+                Aguardando pontos de telemetria...
+            </div>
+        );
+    }
 
     return <div ref={container} className="w-full" />;
 }

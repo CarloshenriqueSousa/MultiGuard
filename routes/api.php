@@ -1,36 +1,10 @@
 <?php
-
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+/**
+ * Rotas da API externa. Apenas a ingestao de telemetria vinda dos agentes, autenticada por token de unidade.
+ * As rotas de leitura do console ficam em web.php para compartilhar a sessao do navegador.
+ */
 
 use App\Http\Controllers\IngestController;
-use App\Http\Controllers\TopologyController;
-use App\Http\Controllers\MetricQueryController;
-use App\Http\Controllers\HealthController;
-use App\Http\Controllers\IncidentController;
-use App\Http\Controllers\SeriesController;
-use App\Http\Controllers\LatestController;
+use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-
-*/
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-Route::middleware(['ingest', 'throttle:120,1'])
-    ->post('/ingest', IngestController::class);
-Route::get('/units/{unit}/topology', [TopologyController::class, 'show']);
-Route::get('/metrics/query', [MetricQueryController::class, 'query']);
-Route::get('/units/{unit}/health', [HealthController::class, 'show']);
-Route::get('/units/{unit}/series', SeriesController::class);
-Route::get('/units/{unit}/incidents', [IncidentController::class, 'index']);
-Route::get('/units/{unit}/latest', LatestController::class);
+Route::middleware(['ingest', 'throttle:120,1'])->post('/ingest', IngestController::class);

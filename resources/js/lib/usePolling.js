@@ -24,6 +24,7 @@ export function usePolling(url, intervalMs) {
             try {
                 const response = await fetch(url, {
                     headers: { Accept: 'application/json' },
+                    credentials: 'same-origin',
                     signal: controller.signal,
                 });
 
