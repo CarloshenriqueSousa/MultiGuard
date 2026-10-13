@@ -73,5 +73,5 @@ run agendador php artisan schedule:work
 run vite npm run dev
 
 echo
-echo "Console: http://127.0.0.1:8000/dashboard   Mapa 3D: http://127.0.0.1:8000/map"
+echo "Console: http://127.0.0.1:8000/dashboard   Mapa de Rede: http://127.0.0.1:8000/map   Login: http://127.0.0.1:8000/login"
 wait

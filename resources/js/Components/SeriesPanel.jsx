@@ -1,8 +1,5 @@
 /**
- * Painel de grafico com seletores de alvo (dispositivo ou enlace), metrica e periodo. As metricas oferecidas
- * dependem do tipo de alvo: ping para dispositivos, SNMP para enlaces. As faixas de incidente mostradas sao so
- * as relevantes para o alvo: para um dispositivo, incidentes em que ele e a raiz ou esta no raio de impacto; para
- * um enlace, os que apontam aquele enlace ou o dispositivo da ponta de baixo. Consulta a serie a cada 5 segundos.
+ * Painel de graficos temporais com controles de selecao de alvo, metrica e janela de tempo.
  */
 
 import { usePolling } from '../lib/usePolling';
@@ -21,14 +18,14 @@ const LINK_METRICS = [
 ];
 
 const PERIODS = [
-    { minutes: 5, label: '5 min' },
-    { minutes: 15, label: '15 min' },
+    { minutes: 5, label: '5 minutos' },
+    { minutes: 15, label: '15 minutos' },
     { minutes: 60, label: '1 hora' },
     { minutes: 360, label: '6 horas' },
     { minutes: 1440, label: '24 horas' },
 ];
 
-const SELECT = 'rounded border border-slate-700 bg-slate-950 px-2 py-1 text-sm text-slate-200';
+const SELECT = 'rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs font-semibold text-slate-200 transition focus:border-sky-500 focus:outline-none';
 
 export default function SeriesPanel({ unitSlug, nodes, edges, incidents, target, onTargetChange, metricId, onMetricChange, minutes, onMinutesChange }) {
     const names = new Map(nodes.map((node) => [node.id, node.name]));
@@ -57,15 +54,22 @@ export default function SeriesPanel({ unitSlug, nodes, edges, incidents, target,
     });
 
     return (
-        <section className="rounded-lg border border-slate-800 bg-slate-900 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-300">Séries temporais</h2>
+        <section className="rounded-xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl backdrop-blur">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
+                <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-sky-400" />
+                    <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-200">
+                        Histórico de Métricas
+                    </h2>
+                </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                     <select className={SELECT} value={effective ?? ''} onChange={(event) => onTargetChange(event.target.value)}>
                         <optgroup label="Dispositivos">
                             {nodes.map((node) => (
-                                <option key={node.id} value={`device:${node.id}`}>{node.name}</option>
+                                <option key={node.id} value={`device:${node.id}`}>
+                                    {node.name} ({node.ip})
+                                </option>
                             ))}
                         </optgroup>
                         <optgroup label="Enlaces">
@@ -101,13 +105,17 @@ export default function SeriesPanel({ unitSlug, nodes, edges, incidents, target,
                 />
             </div>
 
-            {series.error && <p className="mt-2 text-xs text-rose-400">Erro ao consultar a série: {series.error}</p>}
+            {series.error && (
+                <p className="mt-2 text-xs text-rose-400">Erro ao consultar a série: {series.error}</p>
+            )}
+
             {!series.error && series.data && timestamps.length === 0 && (
                 <p className="mt-2 text-xs text-slate-500">Sem pontos neste período. O simulador está rodando?</p>
             )}
+
             {kind === 'device' && metric.id !== 'ping_loss_pct' && (
-                <p className="mt-2 text-xs text-slate-600">
-                    Dispositivo fora do ar não envia RTT nem jitter: a linha some, e a faixa vermelha marca o incidente.
+                <p className="mt-2 text-[11px] text-slate-500">
+                    Dispositivo sem comunicação não gera telemetria RTT/jitter: a faixa vermelha marca o intervalo do incidente.
                 </p>
             )}
         </section>

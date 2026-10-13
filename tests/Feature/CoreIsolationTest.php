@@ -1,10 +1,6 @@
 <?php
 /**
- * Teste de isolamento do Core (K9). Percorre todas as rotas registradas e exige que cada uma esteja atras de um dos
- * dois guardas do Core: o token de ingestao (middleware ingest) ou o usuario interno (middleware console). Depois
- * chama cada rota de console sem credencial e com credencial errada, e a ingestao sem token e com token invalido,
- * e exige 401 em todas. Nao usa RefreshDatabase de proposito: o teste so le o banco de desenvolvimento e nunca o
- * apaga. Execucao: php artisan test --filter=CoreIsolationTest
+ * Teste de isolamento do Core (K9) exigindo protecao de todas as rotas internas pelo middleware console ou ingest.
  */
 
 namespace Tests\Feature;
@@ -21,7 +17,7 @@ class CoreIsolationTest extends TestCase
         foreach (Route::getRoutes()->getRoutes() as $route) {
             $uri = $route->uri();
 
-            if (preg_match('#^(_ignition|sanctum)#', $uri)) {
+            if (preg_match('#^(_ignition|sanctum|login|logout)#', $uri)) {
                 continue;
             }
 
